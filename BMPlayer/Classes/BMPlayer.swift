@@ -40,56 +40,56 @@ public enum BMPlayerAspectRatio : Int {
 open class BMPlayer: UIView {
 
     open var backBlock:(() -> Void)?
-    
+
     /// Gesture used to show / hide control view
     open var tapGesture: UITapGestureRecognizer!
-    
+
     /// Gesture to change volume / brightness
     open var panGesture: UIPanGestureRecognizer!
-    
+
     /// AVLayerVideoGravityType
     open var videoGravity = AVLayerVideoGravityResizeAspect {
         didSet {
             self.playerLayer?.videoGravity = videoGravity
         }
     }
-    
+
     var videoItem: BMPlayerItem!
-    
+
     var currentDefinition = 0
-    
+
     var playerLayer: BMPlayerLayerView?
-    
-    var controlView: BMPlayerCustomControlView!
-    
+
+    open var controlView: BMPlayerCustomControlView!
+
     fileprivate var customControllView: BMPlayerCustomControlView?
-    
+
     var playerItemType = BMPlayerItemType.url
-    
+
     var videoItemURL: URL!
-    
+
     var videoTitle = ""
-    
+
     var isFullScreen:Bool {
         get {
             return UIApplication.shared.statusBarOrientation.isLandscape
         }
     }
-    
+
     /// 滑动方向
     fileprivate var panDirection = BMPanDirection.horizontal
     /// 音量滑竿
     fileprivate var volumeViewSlider: UISlider!
-    
+
     fileprivate let BMPlayerAnimationTimeInterval:Double                = 4.0
     fileprivate let BMPlayerControlBarAutoFadeOutTimeInterval:Double    = 0.5
-    
+
     /// 用来保存时间状态
     fileprivate var sumTime         : TimeInterval = 0
     fileprivate var totalDuration   : TimeInterval = 0
     fileprivate var currentPosition : TimeInterval = 0
     fileprivate var shouldSeekTo    : TimeInterval = 0
-    
+
     fileprivate var isURLSet        = false
     fileprivate var isSliderSliding = false
     fileprivate var isPauseByUser   = false
@@ -97,15 +97,15 @@ open class BMPlayer: UIView {
     fileprivate var isMaskShowing   = false
     fileprivate var isSlowed        = false
     fileprivate var isMirrored      = false
-    
+
     //视频画面比例
     fileprivate var aspectRatio:BMPlayerAspectRatio = .default
-    
-    
+
+
     // MARK: - Public functions
     /**
      直接使用URL播放
-     
+
      - parameter url:   视频URL
      - parameter title: 视频标题
      */
@@ -113,7 +113,7 @@ open class BMPlayer: UIView {
         playerItemType              = BMPlayerItemType.url
         videoItemURL                = url
         controlView.playerTitleLabel?.text = title
-        
+
         if BMPlayerConf.shouldAutoPlay {
             playerLayer?.videoURL   = videoItemURL
             isURLSet                = true
@@ -121,10 +121,10 @@ open class BMPlayer: UIView {
             controlView.hideLoader()
         }
     }
-    
+
     /**
      播放可切换清晰度的视频
-     
+
      - parameter items: 清晰度列表
      - parameter title: 视频标题
      - parameter definitionIndex: 起始清晰度
@@ -135,7 +135,7 @@ open class BMPlayer: UIView {
         controlView.playerTitleLabel?.text = item.title
         currentDefinition           = definitionIndex
         controlView.prepareChooseDefinitionView(item.resource, index: definitionIndex)
-        
+
         if BMPlayerConf.shouldAutoPlay {
             playerLayer?.videoURL   = videoItem.resource[currentDefinition].playURL
             isURLSet                = true
@@ -143,7 +143,7 @@ open class BMPlayer: UIView {
             controlView.showCoverWithLink(item.cover)
         }
     }
-    
+
     /**
      使用自动播放，参照pause函数
      */
@@ -152,7 +152,7 @@ open class BMPlayer: UIView {
             self.play()
         }
     }
-    
+
     /**
      手动播放
      */
@@ -169,20 +169,20 @@ open class BMPlayer: UIView {
         playerLayer?.play()
         isPauseByUser = false
     }
-    
+
     /**
      暂停
-     
+
      - parameter allowAutoPlay: 是否允许自动播放，默认不允许，若允许则在调用autoPlay的情况下开始播放。否则autoPlay不会进行播放。
      */
     open func pause(allowAutoPlay allow: Bool = false) {
         playerLayer?.pause()
         isPauseByUser = !allow
     }
-    
+
     /**
      seek
-     
+
      - parameter to: target time
      */
     open func seek(_ to:TimeInterval) {
@@ -191,7 +191,7 @@ open class BMPlayer: UIView {
             self.shouldSeekTo = 0
         })
     }
-    
+
     /**
      开始自动隐藏UI倒计时
      */
@@ -199,37 +199,37 @@ open class BMPlayer: UIView {
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(hideControlViewAnimated), object: nil)
         self.perform(#selector(hideControlViewAnimated), with: nil, afterDelay: BMPlayerAnimationTimeInterval)
     }
-    
+
     /**
      取消UI自动隐藏
      */
     open func cancelAutoFadeOutControlBar() {
         NSObject.cancelPreviousPerformRequests(withTarget: self)
     }
-    
+
     /**
      旋转屏幕时更新UI
      */
     open func updateUI(_ isFullScreen: Bool) {
         controlView.updateUI(isFullScreen)
     }
-    
+
     open func addVolume() {
         self.volumeViewSlider.value += 0.1
     }
-    
+
     open func reduceVolume() {
         self.volumeViewSlider.value -= 0.1
     }
-    
+
     /**
      准备销毁，适用于手动隐藏等场景
      */
     open func prepareToDealloc() {
         playerLayer?.prepareToDeinit()
     }
-    
-    
+
+
     // MARK: - Action Response
     fileprivate func playStateDidChanged() {
         if isSliderSliding { return }
@@ -242,29 +242,29 @@ open class BMPlayer: UIView {
             }
         }
     }
-    
-    
+
+
     @objc fileprivate func hideControlViewAnimated() {
         UIView.animate(withDuration: BMPlayerControlBarAutoFadeOutTimeInterval, animations: {
             self.controlView.hidePlayerUIComponents()
             if self.isFullScreen {
-                UIApplication.shared.setStatusBarHidden(true, with: UIStatusBarAnimation.fade)
+                //                UIApplication.shared.setStatusBarHidden(true, with: UIStatusBarAnimation.fade)
             }
-        }, completion: { (_) in
-            self.isMaskShowing = false
-        }) 
+            }, completion: { (_) in
+                self.isMaskShowing = false
+        })
     }
-    
+
     @objc fileprivate func showControlViewAnimated() {
         UIView.animate(withDuration: BMPlayerControlBarAutoFadeOutTimeInterval, animations: {
             self.controlView.showPlayerUIComponents()
-            UIApplication.shared.setStatusBarHidden(false, with: UIStatusBarAnimation.fade)
-        }, completion: { (_) in
-            self.autoFadeOutControlBar()
-            self.isMaskShowing = true
-        }) 
+            //            UIApplication.shared.setStatusBarHidden(false, with: UIStatusBarAnimation.fade)
+            }, completion: { (_) in
+                self.autoFadeOutControlBar()
+                self.isMaskShowing = true
+        })
     }
-    
+
     @objc fileprivate func tapGestureTapped(_ sender: UIGestureRecognizer) {
         if isMaskShowing {
             hideControlViewAnimated()
@@ -273,32 +273,32 @@ open class BMPlayer: UIView {
             showControlViewAnimated()
         }
     }
-    
+
     @objc fileprivate func panDirection(_ pan: UIPanGestureRecognizer) {
         // 根据在view上Pan的位置，确定是调音量还是亮度
         let locationPoint = pan.location(in: self)
-        
+
         // 我们要响应水平移动和垂直移动
         // 根据上次和本次移动的位置，算出一个速率的point
         let velocityPoint = pan.velocity(in: self)
-        
+
         // 判断是垂直移动还是水平移动
         switch pan.state {
         case UIGestureRecognizerState.began:
             // 使用绝对值来判断移动的方向
-            
+
             let x = fabs(velocityPoint.x)
             let y = fabs(velocityPoint.y)
-            
+
             if x > y {
                 self.panDirection = BMPanDirection.horizontal
-                
+
                 // 给sumTime初值
                 if let player = playerLayer?.player {
                     let time = player.currentTime()
                     self.sumTime = TimeInterval(time.value) / TimeInterval(time.timescale)
                 }
-                
+
             } else {
                 self.panDirection = BMPanDirection.vertical
                 if locationPoint.x > self.bounds.size.width / 2 {
@@ -307,7 +307,7 @@ open class BMPlayer: UIView {
                     self.isVolume = false
                 }
             }
-            
+
         case UIGestureRecognizerState.changed:
             cancelAutoFadeOutControlBar()
             switch self.panDirection {
@@ -326,7 +326,7 @@ open class BMPlayer: UIView {
                 playerLayer?.seekToTime(self.sumTime, completionHandler: nil)
                 // 把sumTime滞空，不然会越加越多
                 self.sumTime = 0.0
-                
+
             //                controlView.showLoader()
             case BMPanDirection.vertical:
                 self.isVolume = false
@@ -335,45 +335,45 @@ open class BMPlayer: UIView {
             break
         }
     }
-    
+
     fileprivate func verticalMoved(_ value: CGFloat) {
         self.isVolume ? (self.volumeViewSlider.value -= Float(value / 10000)) : (UIScreen.main.brightness -= value / 10000)
     }
-    
+
     fileprivate func horizontalMoved(_ value: CGFloat) {
         isSliderSliding = true
         if let playerItem = playerLayer?.playerItem {
             // 每次滑动需要叠加时间，通过一定的比例，使滑动一直处于统一水平
             self.sumTime = self.sumTime + TimeInterval(value) / 100.0 * (TimeInterval(self.totalDuration)/400)
-            
+
             let totalTime       = playerItem.duration
-            
+
             // 防止出现NAN
             if totalTime.timescale == 0 { return }
-            
+
             let totalDuration   = TimeInterval(totalTime.value) / TimeInterval(totalTime.timescale)
             if (self.sumTime > totalDuration) { self.sumTime = totalDuration}
             if (self.sumTime < 0){ self.sumTime = 0}
-            
+
             let targetTime      = formatSecondsToString(sumTime)
-            
+
             controlView.playerTimeSlider?.value      = Float(sumTime / totalDuration)
             controlView.playerCurrentTimeLabel?.text       = targetTime
             controlView.showSeekToView(sumTime, isAdd: value > 0)
-            
+
         }
     }
-    
+
     @objc fileprivate func progressSliderTouchBegan(_ sender: UISlider)  {
         playerLayer?.onTimeSliderBegan()
         isSliderSliding = true
     }
-    
+
     @objc fileprivate func progressSliderValueChanged(_ sender: UISlider)  {
         self.pause(allowAutoPlay: true)
         cancelAutoFadeOutControlBar()
     }
-    
+
     @objc fileprivate func progressSliderTouchEnded(_ sender: UISlider)  {
         isSliderSliding = false
         autoFadeOutControlBar()
@@ -381,7 +381,7 @@ open class BMPlayer: UIView {
         playerLayer?.seekToTime(target, completionHandler: nil)
         autoPlay()
     }
-    
+
     @objc fileprivate func backButtonPressed(_ button: UIButton) {
         if isFullScreen {
             fullScreenButtonPressed(nil)
@@ -390,7 +390,7 @@ open class BMPlayer: UIView {
             backBlock?()
         }
     }
-    
+
     @objc fileprivate func slowButtonPressed(_ button: UIButton) {
         autoFadeOutControlBar()
         if isSlowed {
@@ -403,7 +403,7 @@ open class BMPlayer: UIView {
             self.controlView.playerSlowButton?.setTitle("正常", for: UIControlState())
         }
     }
-    
+
     @objc fileprivate func mirrorButtonPressed(_ button: UIButton) {
         autoFadeOutControlBar()
         if isMirrored {
@@ -415,14 +415,14 @@ open class BMPlayer: UIView {
             self.isMirrored = true
             self.controlView.playerMirrorButton?.setTitle("正常", for: UIControlState())
         }    }
-    
+
     @objc fileprivate func replayButtonPressed() {
         playerLayer?.seekToTime(0, completionHandler: {
-            
+
         })
         self.play()
     }
-    
+
     @objc fileprivate func playButtonPressed(_ button: UIButton) {
         if button.isSelected {
             self.pause()
@@ -430,7 +430,7 @@ open class BMPlayer: UIView {
             self.play()
         }
     }
-    
+
     @objc fileprivate func ratioButtonPressed(_ button: UIButton) {
         var _ratio = self.aspectRatio.rawValue + 1
         if _ratio > 2 {
@@ -440,11 +440,11 @@ open class BMPlayer: UIView {
         self.controlView.aspectRatioChanged(self.aspectRatio)
         self.playerLayer?.aspectRatio = self.aspectRatio
     }
-    
+
     @objc fileprivate func onOrientationChanged() {
         self.updateUI(isFullScreen)
     }
-    
+
     @objc fileprivate func fullScreenButtonPressed(_ button: UIButton?) {
         if !isURLSet {
             //            self.play()
@@ -452,27 +452,23 @@ open class BMPlayer: UIView {
         controlView.updateUI(!self.isFullScreen)
         if isFullScreen {
             UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
-            UIApplication.shared.setStatusBarHidden(false, with: UIStatusBarAnimation.fade)
-            UIApplication.shared.setStatusBarOrientation(UIInterfaceOrientation.portrait, animated: false)
         } else {
             UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
-            UIApplication.shared.setStatusBarHidden(false, with: UIStatusBarAnimation.fade)
-            UIApplication.shared.setStatusBarOrientation(UIInterfaceOrientation.landscapeRight, animated: false)
         }
     }
-    
+
     // MARK: - 生命周期
     deinit {
         playerLayer?.pause()
         playerLayer?.prepareToDeinit()
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIApplicationDidChangeStatusBarOrientation, object: nil)
     }
-    
-    
+
+
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
-    
+
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         initUI()
@@ -480,7 +476,7 @@ open class BMPlayer: UIView {
         configureVolume()
         preparePlayer()
     }
-    
+
     public convenience init (customControllView: BMPlayerCustomControlView?) {
         self.init(frame:CGRect.zero)
         self.customControllView = customControllView
@@ -489,44 +485,44 @@ open class BMPlayer: UIView {
         configureVolume()
         preparePlayer()
     }
-    
+
     public convenience init() {
         self.init(customControllView:nil)
     }
 
 
-    
+
     fileprivate func formatSecondsToString(_ secounds: TimeInterval) -> String {
         let Min = Int(secounds / 60)
         let Sec = Int(secounds.truncatingRemainder(dividingBy: 60))
         return String(format: "%02d:%02d", Min, Sec)
     }
-    
+
     // MARK: - 初始化
     fileprivate func initUI() {
         self.backgroundColor = UIColor.black
-        
+
         if let customView = customControllView {
             controlView = customView
         } else {
             controlView =  BMPlayerControlView()
         }
-        
+
         addSubview(controlView.getView)
         controlView.updateUI(isFullScreen)
         controlView.delegate = self
         controlView.getView.snp.makeConstraints { (make) in
             make.edges.equalTo(self)
         }
-        
+
         tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.tapGestureTapped(_:)))
         self.addGestureRecognizer(tapGesture)
-        
+
         panGesture = UIPanGestureRecognizer(target: self, action: #selector(self.panDirection(_:)))
         //        panGesture.delegate = self
         self.addGestureRecognizer(panGesture)
     }
-    
+
     fileprivate func initUIData() {
         controlView.playerPlayButton?.addTarget(self, action: #selector(self.playButtonPressed(_:)), for: UIControlEvents.touchUpInside)
         controlView.playerFullScreenButton?.addTarget(self, action: #selector(self.fullScreenButtonPressed(_:)), for: UIControlEvents.touchUpInside)
@@ -537,10 +533,10 @@ open class BMPlayer: UIView {
         controlView.playerSlowButton?.addTarget(self, action: #selector(slowButtonPressed(_:)), for: .touchUpInside)
         controlView.playerMirrorButton?.addTarget(self, action: #selector(mirrorButtonPressed(_:)), for: .touchUpInside)
         controlView.playerRatioButton?.addTarget(self, action: #selector(self.ratioButtonPressed(_:)), for: UIControlEvents.touchUpInside)
-        
+
         NotificationCenter.default.addObserver(self, selector: #selector(self.onOrientationChanged), name: NSNotification.Name.UIApplicationDidChangeStatusBarOrientation, object: nil)
     }
-    
+
     fileprivate func configureVolume() {
         let volumeView = MPVolumeView()
         for view in volumeView.subviews {
@@ -549,7 +545,7 @@ open class BMPlayer: UIView {
             }
         }
     }
-    
+
     fileprivate func preparePlayer() {
         playerLayer = BMPlayerLayerView()
         playerLayer!.videoGravity = videoGravity
@@ -567,20 +563,20 @@ extension BMPlayer: BMPlayerLayerViewDelegate {
     public func bmPlayer(player: BMPlayerLayerView, playerIsPlaying playing: Bool) {
         playStateDidChanged()
     }
-    
+
     public func bmPlayer(player: BMPlayerLayerView ,loadedTimeDidChange  loadedDuration: TimeInterval , totalDuration: TimeInterval) {
         self.totalDuration = totalDuration
         BMPlayerManager.shared.log("loadedTimeDidChange - \(loadedDuration) - \(totalDuration)")
         controlView.playerProgressView?.setProgress(Float(loadedDuration)/Float(totalDuration), animated: true)
     }
-    
+
     public func bmPlayer(player: BMPlayerLayerView, playerStateDidChange state: BMPlayerState) {
         BMPlayerManager.shared.log("playerStateDidChange - \(state)")
         switch state {
         case BMPlayerState.readyToPlay:
             if shouldSeekTo != 0 {
                 playerLayer?.seekToTime(shouldSeekTo, completionHandler: {
-                
+
                 })
                 shouldSeekTo = 0
             }
@@ -599,7 +595,7 @@ extension BMPlayer: BMPlayerLayerViewDelegate {
             break
         }
     }
-    
+
     public func bmPlayer(player: BMPlayerLayerView, playTimeDidChange currentTime: TimeInterval, totalTime: TimeInterval) {
         self.currentPosition = currentTime
         BMPlayerManager.shared.log("playTimeDidChange - \(currentTime) - \(totalTime)")
@@ -609,7 +605,7 @@ extension BMPlayer: BMPlayerLayerViewDelegate {
         }
         controlView.playerCurrentTimeLabel?.text = formatSecondsToString(currentTime)
         controlView.playerTotalTimeLabel?.text = formatSecondsToString(totalTime)
-        
+
         controlView.playerTimeSlider?.value    = Float(currentTime) / Float(totalTime)
     }
 }
@@ -621,7 +617,7 @@ extension BMPlayer: BMPlayerControlViewDelegate {
         playerLayer?.videoURL       = videoItem.resource[index].playURL
         currentDefinition           = index
     }
-    
+
     public func controlViewDidPressOnReply() {
         replayButtonPressed()
     }

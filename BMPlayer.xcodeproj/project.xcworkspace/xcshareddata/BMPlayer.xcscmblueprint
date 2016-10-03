@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "8CE366408ACBAF2B4284C087C094C0522EAC2479",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "9B4A19C9D4C6523C653E5B183EF6A573CE73CC1B" : 9223372036854775807,
+    "8CE366408ACBAF2B4284C087C094C0522EAC2479" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "B7418D0B-E62B-4D66-B688-3C73E6DB6AC1",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "9B4A19C9D4C6523C653E5B183EF6A573CE73CC1B" : "..\/..\/..\/..",
+    "8CE366408ACBAF2B4284C087C094C0522EAC2479" : "BMPlayer\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "BMPlayer",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "BMPlayer.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:adrianodiasx93\/BMPlayer.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "8CE366408ACBAF2B4284C087C094C0522EAC2479"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "remote_url",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "9B4A19C9D4C6523C653E5B183EF6A573CE73CC1B"
+    }
+  ]
+}
