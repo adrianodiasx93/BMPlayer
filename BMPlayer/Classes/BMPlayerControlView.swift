@@ -187,7 +187,7 @@ class BMPlayerControlView: UIView, BMPlayerCustomControlView {
     
     func showCoverWithLink(_ cover:String) {
         if let url = URL(string: cover) {
-            DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default).async {
+            DispatchQueue.global(qos: .default).async {
                 let data = try? Data(contentsOf: url) //make sure your image in this url does exist, otherwise unwrap in a if let check
                 DispatchQueue.main.async(execute: {
                     self.maskImageView.image = UIImage(data: data!)
